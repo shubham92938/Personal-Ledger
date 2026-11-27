@@ -31,7 +31,8 @@
         {
           "faceIDPermission": "Allow PocketLedger to authenticate you before showing your ledger."
         }
-      ]
+      ],
+      "expo-background-task"
     ],
     "scheme": "pocketledger"
   }

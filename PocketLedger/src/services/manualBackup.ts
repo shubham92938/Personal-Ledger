@@ -20,10 +20,9 @@ async function verify(db: SQLite.SQLiteDatabase, expectedSchema: SchemaRow[]) {
   if (!sameSchema(expectedSchema,await schema(db))) throw new Error('Backup database structure does not match this app version.');
 }
 function supported() {if (Platform.OS === 'web') throw new Error('Manual backup is available on Android and iOS, not in the web preview.');}
-/** Opens a share sheet for an encrypted file; this does not prove it was saved elsewhere. */
-export async function shareEncryptedBackup(key: string) {
+/** Create an authenticated snapshot; shared by file export and Drive. */
+export async function createEncryptedBackup(key: string): Promise<string> {
   supported();
-  if (!(await Sharing.isAvailableAsync())) throw new Error('File sharing is unavailable on this device.');
   const bytes=await withLedgerDatabase(async db=>{
     const expected=await schema(db); await verify(db,expected);
     const data=normalizeSQLiteSnapshot(await db.serializeAsync());
@@ -31,7 +30,13 @@ export async function shareEncryptedBackup(key: string) {
     try {await verify(snapshot,expected);} finally {await snapshot.closeAsync();}
     return data;
   });
-  const content=await sealDatabase(bytes,key);
+  return sealDatabase(bytes,key);
+}
+/** Opens a share sheet for an encrypted file; this does not prove it was saved elsewhere. */
+export async function shareEncryptedBackup(key: string) {
+  supported();
+  if (!(await Sharing.isAvailableAsync())) throw new Error('File sharing is unavailable on this device.');
+  const content=await createEncryptedBackup(key);
   const file=new File(Paths.cache,`PocketLedger-${Date.now()}.plbackup`);
   await file.write(content);
   await Sharing.shareAsync(file.uri,{mimeType:'application/octet-stream',dialogTitle:'Save encrypted PocketLedger backup'});
