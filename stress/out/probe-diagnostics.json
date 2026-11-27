@@ -1,0 +1,25 @@
+{
+  "env": {
+    "LIBGL_ALWAYS_SOFTWARE": "1",
+    "GALLIUM_DRIVER": "llvmpipe",
+    "EGL_PLATFORM": "surfaceless",
+    "LP_NUM_THREADS": "4"
+  },
+  "raw_surfaceless": {
+    "lib": "libEGL.so.1",
+    "surfaceless_platform_available": true,
+    "surfaceless_dpy": true,
+    "initialize_err": "0x3001"
+  },
+  "moderngl_version": "5.13.0",
+  "egl_default": {
+    "GL_RENDERER": "llvmpipe (LLVM 21.1.8, 256 bits)",
+    "GL_VERSION": "4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3",
+    "GL_VENDOR": "Mesa"
+  },
+  "engine_stage": {
+    "status": "FAILED",
+    "error": "KeyError('time')",
+    "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/Personal-Ledger/Personal-Ledger/stress/probe.py\", line 200, in <module>\n    stage.frame(prev, \"wide\")\n  File \"/home/runner/work/Personal-Ledger/Personal-Ledger/v6/stage_cine_v3.py\", line 105, in frame\n    result=super().frame(s,name)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/Personal-Ledger/Personal-Ledger/v6/engine/stage_cine.py\", line 258, in frame\n    f.use();g.viewport=(0,0,w,h);p=self.post;p['inv']=(1./w,1./h);p['focus']=float(meta.get('focus_'+name,np.linalg.norm(l.eye-l.tar)));p['aperture']=meta.get('aperture',22.)*min(w,h)/1080.;p['time']=s.time\n                                                                                                                                                                                              ~^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/moderngl/__init__.py\", line 470, in __setitem__\n    self._members[key].value = value\n    ~~~~~~~~~~~~~^^^^^\nKeyError: 'time'\n"
+  }
+}
