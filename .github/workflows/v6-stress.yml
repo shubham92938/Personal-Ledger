@@ -146,12 +146,15 @@ jobs:
           git config user.name "v6-stress-bot"
           git config user.email "actions@users.noreply.github.com"
           mkdir -p stress/out
-          git add -f stress/out 2>/dev/null || true
-          git commit -q -m "V6 stress test diagnostics (failure)" || echo "nothing to commit"
-          for i in 1 2 3; do
-            git pull --rebase -q origin "${GITHUB_REF#refs/heads/}" && git push -q origin "HEAD:${GITHUB_REF#refs/heads/}" && break
-            echo "push retry $i"; sleep 5
-          done
+          ls -la stress/out || true
+          git add -f stress/out || true
+          ST=$(git status --short | head -5 | tr '\n' ';')
+          git commit -m "V6 stress test diagnostics (failure)" > /tmp/c.log 2>&1
+          C=$(tail -3 /tmp/c.log | tr '\n' ';')
+          echo "::error title=v6git-status::$ST"
+          echo "::error title=v6git-commit::$C"
+          P=$(git push origin "HEAD:${GITHUB_REF#refs/heads/}" 2>&1) || true
+          echo "::error title=v6git-push::$(echo "$P" | tail -3 | tr '\n' ';')" 
 
       - name: Upload artifacts (best effort)
         if: ${{ always() }}
