@@ -37,7 +37,7 @@ sys.path[:0] = [str(V6), str(V6 / "engine")]
 
 WINDOWS = [
     ("s1-establishing", 6.8, 10.7),
-    ("s2-dolly-machine", 41.3, 47.3),
+    ("s2-dolly-machine", 41.4, 47.4),
     ("s3-gears-macro", 1012.0, 1018.0),
     ("s4-wheel-track", 640.0, 646.0),
     ("s5-water-macro", 84.0, 88.0),

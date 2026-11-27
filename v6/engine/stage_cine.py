@@ -255,6 +255,12 @@ class Stage(Fast):
         self.mat(p,'vp',l.vp);self.draw(self.list(s.objects,l.vp))
         a.use(4);z.use(5);hf.use(6);g.enable_only(0);fx.use();g.viewport=(0,0,*fx.size);p=self.f;p['inv']=(1./w,1./h);p['eye']=tuple(l.eye);p['shaft']=meta.get('shaft',0.);p['window_distance']=meta.get('window_z',-5.58)
         R=l.v[:3,:3].T@np.diag([1./l.proj[0,0],1./l.proj[1,1],-1.]);self.mat(p,'rays',R);self.fa.render(vertices=3)
-        f.use();g.viewport=(0,0,w,h);p=self.post;p['inv']=(1./w,1./h);p['focus']=float(meta.get('focus_'+name,np.linalg.norm(l.eye-l.tar)));p['aperture']=meta.get('aperture',22.)*min(w,h)/1080.;p['time']=s.time
+        f.use();g.viewport=(0,0,w,h);p=self.post;p['inv']=(1./w,1./h);p['focus']=float(meta.get('focus_'+name,np.linalg.norm(l.eye-l.tar)));p['aperture']=meta.get('aperture',22.)*min(w,h)/1080.
+        # STRESS-TEST FIX (F1): V5's stable-grain patch removed the FINISH
+        # shader's only use of `time`, so the uniform is inactive and assigning
+        # it raised KeyError on every frame. Guard the assignment; V3/V4 keep
+        # the animated grain, V5/V6 intentionally freeze it.
+        try:p['time']=s.time
+        except KeyError:pass
         self.pa.render(vertices=3)
         return f.read(components=4,alignment=1)

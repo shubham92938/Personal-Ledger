@@ -22,14 +22,14 @@ OUT.mkdir(parents=True, exist_ok=True)
 LOG = {}
 
 
-def annotate(label: str, payload):
+def annotate(label: str, payload, level="error"):
     """Emit a payload as GitHub annotations (base64-chunked, API-readable)."""
     if isinstance(payload, (dict, list)):
         payload = json.dumps(payload)
     b = base64.b64encode(payload.encode()).decode()
     chunks = [b[i:i + 600] for i in range(0, len(b), 600)][:40]
     for i, ch in enumerate(chunks):
-        print(f"::error title=v6diag-{label}-{i + 1}of{len(chunks)}::{ch}", flush=True)
+        print(f"::{level} title=v6diag-{label}-{i + 1}of{len(chunks)}::{ch}", flush=True)
 
 
 def save():
@@ -38,7 +38,7 @@ def save():
 
 def finish(ok):
     save()
-    annotate("result", json.dumps({"ok": ok, **{k: v for k, v in LOG.items() if k != "raw_surfaceless"}}))
+    annotate("result", json.dumps({"ok": ok, **{k: v for k, v in LOG.items() if k != "raw_surfaceless"}}), level="notice" if ok else "error")
     sys.exit(0 if ok else 1)
 
 
