@@ -6,22 +6,23 @@ import { Button, Chip, Field, Header, Screen } from '../../components/ui';
 import { colors as c } from '../../constants/theme';
 import { createLoan } from '../../database/database';
 import { localToday } from '../../services/interest';
-import { parseRupees } from '../../services/money';
-import { AccountKind, LoanDirection, RatePeriod } from '../../types';
+import { parseInterestBps, parseRupees } from '../../services/money';
+import { AccountKind, RatePeriod } from '../../types';
 export default function AddLoan() {const {t}=useLanguage();
   const params = useLocalSearchParams<{direction?: string}>();
-  const [direction, setDirection] = useState<LoanDirection>(params.direction === 'borrowed' ? 'borrowed' : 'lent');
+  // The selected People section determines direction; it cannot silently change in this form.
+  const direction = params.direction === 'borrowed' ? 'borrowed' : 'lent';
   const [name,setName]=useState(''); const [phone,setPhone]=useState(''); const [amount,setAmount]=useState(''); const [balanceKind,setBalanceKind]=useState<AccountKind|null>(null);
   const [rate,setRate]=useState('0'); const [period,setPeriod]=useState<RatePeriod>('monthly'); const [date,setDate]=useState(localToday()); const [due,setDue]=useState(''); const [notes,setNotes]=useState(''); const [problem,setProblem]=useState(''); const [busy,setBusy]=useState(false);
   async function save() {
-    const principal=parseRupees(amount); const bps=parseRupees(rate);
+    const principal=parseRupees(amount); const bps=parseInterestBps(rate);
     if(!name.trim() || !balanceKind || principal===null || principal<=0 || bps===null || bps>10000) {setProblem('Enter a name, balance type, positive amount and interest rate between 0 and 100%.');return;}
     setBusy(true);setProblem('');
     try {const id=await createLoan({person_name:name,phone,direction,principal_paise:principal,account_id:0,rate_bps:bps,rate_period:period,started_on:date,due_on:due.trim()||null,notes},balanceKind);router.replace({pathname:'/loan/[id]',params:{id:String(id)}});}
     catch(e){setProblem(e instanceof Error?e.message:'Unable to save loan.');}finally{setBusy(false);}
   }
   return <Screen><Header title="Add Loan" back/>
-    <View style={{flexDirection:'row',gap:8,marginBottom:20}}><View style={{flex:1}}><Chip label="I lent money" active={direction==='lent'} onPress={()=>setDirection('lent')}/></View><View style={{flex:1}}><Chip label="I borrowed money" active={direction==='borrowed'} onPress={()=>setDirection('borrowed')}/></View></View>
+    <View style={{backgroundColor:c.card,borderRadius:14,padding:14,marginBottom:20}}><Text style={{color:c.white,fontWeight:'700',marginBottom:6}}>{t(direction==='lent'?'They owe me (I lent money)':'I owe them (I borrowed money)')}</Text><Text style={{color:c.muted,fontSize:12,lineHeight:18}}>{t(direction==='lent'?'Money goes out now; repayments come back to you.':'Money comes in now; repayments go out from you.')}</Text></View>
     <Field label="Person name" value={name} onChangeText={setName} placeholder="Enter name" maxLength={60}/><Field label="Phone (optional)" value={phone} onChangeText={setPhone} placeholder="Phone number" keyboardType="phone-pad" maxLength={30}/><Field label="Principal amount (₹)" value={amount} onChangeText={setAmount} placeholder="0.00" keyboardType="decimal-pad"/>
     <Text style={{color:c.white,fontWeight:'600',marginBottom:10}}>{t('Balance type')}</Text><View style={{flexDirection:'row',gap:8,marginBottom:20}}><Chip label="Cash" active={balanceKind==='cash'} onPress={()=>setBalanceKind('cash')}/><Chip label="Online" active={balanceKind==='online'} onPress={()=>setBalanceKind('online')}/></View>
     <Field label="Interest rate % (optional)" value={rate} onChangeText={setRate} placeholder="0" keyboardType="decimal-pad"/>{rate!=='0'&&rate!==''&&<><Text style={{color:c.white,fontWeight:'600',marginBottom:10}}>{t("Interest period")}</Text><View style={{flexDirection:'row',gap:8,marginBottom:20}}><Chip label="Monthly" active={period==='monthly'} onPress={()=>setPeriod('monthly')}/><Chip label="Yearly" active={period==='yearly'} onPress={()=>setPeriod('yearly')}/></View></>}

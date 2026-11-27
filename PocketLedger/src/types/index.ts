@@ -8,3 +8,6 @@ export type RatePeriod = 'monthly' | 'yearly';
 export type Loan = { id: number; person_id: number; person_name: string; phone: string; direction: LoanDirection; principal_paise: number; account_id: number; account_name: string; account_kind: AccountKind; rate_bps: number; rate_period: RatePeriod; started_on: string; due_on: string | null; notes: string };
 export type Repayment = { id: number; loan_id: number; account_id: number; account_name: string; account_kind: AccountKind; amount_paise: number; paid_on: string; notes: string };
 export type LoanInput = { person_name: string; phone: string; direction: LoanDirection; principal_paise: number; account_id: number; rate_bps: number; rate_period: RatePeriod; started_on: string; due_on: string | null; notes: string };
+/** A loan cash movement projected from existing records, not a second transaction. */
+export type LoanActivity = { event_type: 'loan' | 'repayment'; id: number; loan_id: number; direction: LoanDirection; person_name: string; amount_paise: number; occurred_at: string; account_kind: AccountKind; notes: string };
+export type HistoryItem = {type: 'transaction'; transaction: LedgerTransaction} | {type: 'loan'; activity: LoanActivity};

@@ -6,6 +6,12 @@ export function parseRupees(value: string): number | null {
   const paise = whole * 100 + Number((match[2] || '').padEnd(2, '0'));
   return Number.isSafeInteger(paise) && paise <= 900000000000 ? paise : null;
 }
+/** An omitted optional interest rate means zero; otherwise parse hundredths of a percent. */
+export function parseInterestBps(value: string): number | null {
+  if (!value.trim()) return 0;
+  const bps = parseRupees(value);
+  return bps !== null && bps <= 10000 ? bps : null;
+}
 export function formatMoney(paise: number): string {
   const sign = paise < 0 ? '-' : '';
   const abs = Math.abs(paise);
