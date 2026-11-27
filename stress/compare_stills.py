@@ -67,8 +67,8 @@ def main():
             sheet.paste(im, (i * 620, 0))
             d.text((i * 620 + 10, 350 + 6), f"{ver.upper()}  t={t}s  f={f}",
                    font=font, fill="#f0e6d2")
-        sheet.save(a.out / f"version-compare-t{t:05d}.png")
-        print("SHEET", a.out / f"version-compare-t{t:05d}.png", flush=True)
+        sheet.save(a.out / f"version-compare-t{t:05d}.jpg", quality=92)
+        print("SHEET", a.out / f"version-compare-t{t:05d}.jpg", flush=True)
     print("COMPARE_DONE", flush=True)
 
 

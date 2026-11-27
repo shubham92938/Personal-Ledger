@@ -54,7 +54,7 @@ def encode(width, height, fps, path, ffmpeg):
          "-r", str(fps), "-i", "-",
          "-vf", "vflip,format=yuv420p",
          "-threads", "2", "-c:v", "libx264", "-preset", "veryfast",
-         "-crf", "20", "-g", "48", "-movflags", "+faststart",
+         "-crf", "23", "-g", "48", "-movflags", "+faststart",
          "-video_track_timescale", "24000", "-an", str(path)],
         stdin=subprocess.PIPE)
 
@@ -114,8 +114,8 @@ def render_clip(stage, film, name, t0, t1, fps, width, outdir, ffmpeg,
                 from PIL import Image
                 im = Image.frombytes("RGBA", (width, h), raw
                                      ).transpose(Image.Transpose.FLIP_TOP_BOTTOM).convert("RGB")
-                pn = outdir / f"frame-{name}-{'static' if frozen else 'moving'}-{i:03d}.png"
-                im.save(pn)
+                pn = outdir / f"frame-{name}-{'static' if frozen else 'moving'}-{i:03d}.jpg"
+                im.save(pn, quality=92)
                 saved.append(str(pn))
             if i == 1 and budget_tpf is not None:
                 tpf = (time.monotonic() - t_start) / 2
