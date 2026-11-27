@@ -1,6 +1,7 @@
 import { useLanguage } from '../localization/LanguageProvider';
 import React, { useState } from 'react';
 import { Alert, Text, View } from 'react-native';
+import { router } from 'expo-router';
 import { Button, Field, Header, Screen } from '../components/ui';
 import { colors as c } from '../constants/theme';
 import { generateRecoveryKey } from '../services/backupCrypto';
@@ -21,7 +22,8 @@ export default function Backup(){const {t}=useLanguage();
   }
   async function safety(){setBusy(true);setStatus('');try{await shareLatestSafetyBackup();setStatus('Share sheet closed. Verify that the safety copy was saved elsewhere. Use the recovery key entered during that restore.');}catch(e){setStatus(e instanceof Error?e.message:'Unable to share the safety copy.');}finally{setBusy(false);}}
   return <Screen><Header title="Backup & Restore" back/>
-    <View style={{backgroundColor:'#3d2520',padding:16,borderRadius:14,marginBottom:18}}><Text style={{color:'#ffcfb5',fontWeight:'700',marginBottom:6}}>{t("Experimental manual backup")}</Text><Text style={{color:'#ffcfb5',fontSize:12,lineHeight:19}}>{t("Google Drive sign-in and automatic backups are not available. This manual export and restore has not yet been tested on an Android device. Do not rely on it as your only backup.")}</Text></View>
+    <Button title="Google Drive backup" onPress={()=>router.push('/drive-backup')}/><View style={{height:18}}/>
+    <View style={{backgroundColor:'#3d2520',padding:16,borderRadius:14,marginBottom:18}}><Text style={{color:'#ffcfb5',fontWeight:'700',marginBottom:6}}>{t("Experimental manual backup")}</Text><Text style={{color:'#ffcfb5',fontSize:12,lineHeight:19}}>{t("Manual export and restore has not yet been tested on an Android device. Do not rely on it as your only backup.")}</Text></View>
     <Text style={{color:c.white,fontWeight:'700',fontSize:16,marginBottom:10}}>{t("Recovery key")}</Text><Text style={{color:c.muted,fontSize:13,lineHeight:20,marginBottom:14}}>{t("Generate a new random key for each backup. The app does not save it. Store it somewhere safe, separately from your backup file. If you lose it, the backup cannot be decrypted. Anyone with the key and file can read your records.")}</Text>
     <Field label="64-character recovery key" value={key} onChangeText={setKey} autoCapitalize="none" autoCorrect={false} placeholder="Generate or enter your key" multiline/>
     <Button title="Generate new recovery key" secondary disabled={busy} onPress={()=>void generate()}/><View style={{height:18}}/>
