@@ -63,7 +63,21 @@ async function saveAccountInternal(name: string, kind: AccountKind, opening: num
 }
 async function listTransactionsInternal(): Promise<LedgerTransaction[]> {
   const db = await database();
-  return db.getAllAsync<LedgerTransaction>(`SELECT t.*, a.name account_name, d.name destination_name FROM transactions t JOIN accounts a ON a.id=t.account_id LEFT JOIN accounts d ON d.id=t.destination_id WHERE t.deleted_at IS NULL ORDER BY t.occurred_at DESC, t.id DESC`);
+  return db.getAllAsync<LedgerTransaction>(`SELECT t.*, a.name account_name, a.kind account_kind, d.name destination_name, d.kind destination_kind FROM transactions t JOIN accounts a ON a.id=t.account_id LEFT JOIN accounts d ON d.id=t.destination_id WHERE t.deleted_at IS NULL ORDER BY t.occurred_at DESC, t.id DESC`);
+}
+/** Keep legacy account rows intact, but choose a backing row automatically per balance type. */
+async function resolveBalanceAccount(db: SQLite.SQLiteDatabase, kind?: AccountKind, preferredId = 0): Promise<number> {
+  if (kind !== 'cash' && kind !== 'online') throw new Error('Choose cash or online.');
+  if (preferredId) {
+    const preferred = await db.getFirstAsync<{id: number}>('SELECT id FROM accounts WHERE id=? AND kind=?',preferredId,kind);
+    if (preferred) return preferred.id;
+  }
+  const existing = await db.getFirstAsync<{id: number}>('SELECT id FROM accounts WHERE kind=? ORDER BY id LIMIT 1',kind);
+  if (existing) return existing.id;
+  const name = kind === 'cash' ? 'Cash' : 'Online';
+  const created = await db.runAsync('INSERT INTO accounts(name,kind,opening_paise) VALUES(?,?,0)',name,kind);
+  await db.runAsync('INSERT INTO audit_logs(entity,entity_id,action,after_json,created_at) VALUES(?,?,?,?,?)','account',created.lastInsertRowId,'create',JSON.stringify({name,kind,opening_paise:0}),new Date().toISOString());
+  return created.lastInsertRowId;
 }
 async function saveTransactionInternal(input: TransactionInput, id?: number, accountKind?: AccountKind) {
   if (!Number.isSafeInteger(input.amount_paise) || input.amount_paise <= 0 || (!input.account_id && !accountKind) || !Number.isFinite(Date.parse(input.occurred_at))) throw new Error('Enter a valid amount, account and date.');
@@ -73,20 +87,7 @@ async function saveTransactionInternal(input: TransactionInput, id?: number, acc
     const before = id ? await db.getFirstAsync<{kind: string}>('SELECT * FROM transactions WHERE id=? AND deleted_at IS NULL',id) : null;
     if (id && !before) throw new Error('Transaction not found.');
     assertEditableTransaction(input.kind, input.destination_id, before?.kind);
-    let accountId = input.account_id;
-    if (!accountId && accountKind) {
-      const candidates = await db.getAllAsync<{id: number}>('SELECT id FROM accounts WHERE kind=? ORDER BY id',accountKind);
-      if (candidates.length > 1) throw new Error('Select the account for this transaction.');
-      if (candidates.length === 1) accountId = candidates[0].id;
-      else {
-        const name = accountKind === 'cash' ? 'Cash' : 'Online';
-        const created = await db.runAsync('INSERT INTO accounts(name,kind,opening_paise) VALUES(?,?,0)',name,accountKind);
-        accountId = created.lastInsertRowId;
-        await db.runAsync('INSERT INTO audit_logs(entity,entity_id,action,after_json,created_at) VALUES(?,?,?,?,?)','account',accountId,'create',JSON.stringify({name,kind:accountKind,opening_paise:0}),new Date().toISOString());
-      }
-    }
-    const selected = await db.getFirstAsync<{kind: AccountKind}>('SELECT kind FROM accounts WHERE id=?',accountId);
-    if (!selected || (accountKind && selected.kind !== accountKind)) throw new Error('Select a valid account in the chosen category.');
+    const accountId = await resolveBalanceAccount(db, accountKind, input.account_id);
     const values = [input.kind,input.amount_paise,accountId,input.destination_id,input.occurred_at,input.description.trim(),input.category.trim()] as const;
     const result = id ? await db.runAsync('UPDATE transactions SET kind=?,amount_paise=?,account_id=?,destination_id=?,occurred_at=?,description=?,category=? WHERE id=?',...values,id) : await db.runAsync('INSERT INTO transactions(kind,amount_paise,account_id,destination_id,occurred_at,description,category) VALUES(?,?,?,?,?,?,?)',...values);
     const target = id ?? result.lastInsertRowId;
@@ -118,15 +119,15 @@ async function deleteAccountInternal(id: number) {
 
 async function listLoansInternal(): Promise<Loan[]> {
   const db = await database();
-  return db.getAllAsync<Loan>(`SELECT l.*, p.name AS person_name, p.phone, a.name AS account_name FROM loans l JOIN people p ON p.id=l.person_id JOIN accounts a ON a.id=l.account_id WHERE l.deleted_at IS NULL ORDER BY l.started_on DESC,l.id DESC`);
+  return db.getAllAsync<Loan>(`SELECT l.*, p.name AS person_name, p.phone, a.name AS account_name, a.kind AS account_kind FROM loans l JOIN people p ON p.id=l.person_id JOIN accounts a ON a.id=l.account_id WHERE l.deleted_at IS NULL ORDER BY l.started_on DESC,l.id DESC`);
 }
 async function listRepaymentsInternal(loanId: number): Promise<Repayment[]> {
   const db = await database();
-  return db.getAllAsync<Repayment>(`SELECT r.*, a.name AS account_name FROM repayments r JOIN accounts a ON a.id=r.account_id WHERE r.loan_id=? AND r.deleted_at IS NULL ORDER BY r.paid_on,r.id`, loanId);
+  return db.getAllAsync<Repayment>(`SELECT r.*, a.name AS account_name, a.kind AS account_kind FROM repayments r JOIN accounts a ON a.id=r.account_id WHERE r.loan_id=? AND r.deleted_at IS NULL ORDER BY r.paid_on,r.id`, loanId);
 }
-async function createLoanInternal(input: LoanInput): Promise<number> {
+async function createLoanInternal(input: LoanInput, balanceKind?: AccountKind): Promise<number> {
   const today = localToday();
-  if (!input.person_name.trim() || !input.account_id || !['borrowed','lent'].includes(input.direction)) throw new Error('Enter a name and select an account.');
+  if (!input.person_name.trim() || (!input.account_id && !balanceKind) || !['borrowed','lent'].includes(input.direction)) throw new Error('Enter a name and select an account.');
   dateDay(input.started_on);
   if (input.started_on > today) throw new Error('Loan date cannot be in the future.');
   if (input.due_on) {
@@ -136,25 +137,27 @@ async function createLoanInternal(input: LoanInput): Promise<number> {
   calculateLoan(input, [], input.started_on);
   const db = await database(); let loanId = 0;
   await db.withTransactionAsync(async () => {
+    const accountId = await resolveBalanceAccount(db, balanceKind, input.account_id);
     const person = await db.runAsync('INSERT INTO people(name,phone) VALUES(?,?)', input.person_name.trim(), input.phone.trim());
-    const result = await db.runAsync('INSERT INTO loans(person_id,direction,principal_paise,account_id,rate_bps,rate_period,started_on,due_on,notes) VALUES(?,?,?,?,?,?,?,?,?)',person.lastInsertRowId,input.direction,input.principal_paise,input.account_id,input.rate_bps,input.rate_period,input.started_on,input.due_on,input.notes.trim());
+    const result = await db.runAsync('INSERT INTO loans(person_id,direction,principal_paise,account_id,rate_bps,rate_period,started_on,due_on,notes) VALUES(?,?,?,?,?,?,?,?,?)',person.lastInsertRowId,input.direction,input.principal_paise,accountId,input.rate_bps,input.rate_period,input.started_on,input.due_on,input.notes.trim());
     loanId = result.lastInsertRowId;
-    await db.runAsync('INSERT INTO audit_logs(entity,entity_id,action,after_json,created_at) VALUES(?,?,?,?,?)','loan',loanId,'create',JSON.stringify(input),new Date().toISOString());
+    await db.runAsync('INSERT INTO audit_logs(entity,entity_id,action,after_json,created_at) VALUES(?,?,?,?,?)','loan',loanId,'create',JSON.stringify({...input,account_id:accountId}),new Date().toISOString());
   });
   return loanId;
 }
-async function addRepaymentInternal(loanId: number, accountId: number, amount: number, paidOn: string, notes: string): Promise<void> {
+async function addRepaymentInternal(loanId: number, accountId: number, amount: number, paidOn: string, notes: string, balanceKind?: AccountKind): Promise<void> {
   const db = await database();
   await db.withTransactionAsync(async () => {
     const loan = await db.getFirstAsync<Loan>('SELECT * FROM loans WHERE id=? AND deleted_at IS NULL', loanId);
-    if (!loan || !accountId || !Number.isSafeInteger(amount) || amount <= 0) throw new Error('Select an account and enter a positive repayment.');
+    if (!loan || (!accountId && !balanceKind) || !Number.isSafeInteger(amount) || amount <= 0) throw new Error('Select an account and enter a positive repayment.');
     const payments = await db.getAllAsync<Repayment>('SELECT * FROM repayments WHERE loan_id=? AND deleted_at IS NULL ORDER BY paid_on,id', loanId);
     dateDay(paidOn);
     if (paidOn > localToday() || paidOn < loan.started_on || (payments.length && paidOn < payments[payments.length-1].paid_on)) throw new Error('Repayment must be today or earlier and not before the loan or last repayment.');
     // Re-evaluate the whole history including the proposed payment before writing.
     calculateLoan(loan, [...payments, {amount_paise: amount, paid_on: paidOn}], paidOn);
-    const result = await db.runAsync('INSERT INTO repayments(loan_id,account_id,amount_paise,paid_on,notes) VALUES(?,?,?,?,?)',loanId,accountId,amount,paidOn,notes.trim());
-    await db.runAsync('INSERT INTO audit_logs(entity,entity_id,action,after_json,created_at) VALUES(?,?,?,?,?)','repayment',result.lastInsertRowId,'create',JSON.stringify({loanId,accountId,amount,paidOn,notes:notes.trim()}),new Date().toISOString());
+    const resolvedAccount = await resolveBalanceAccount(db, balanceKind, accountId);
+    const result = await db.runAsync('INSERT INTO repayments(loan_id,account_id,amount_paise,paid_on,notes) VALUES(?,?,?,?,?)',loanId,resolvedAccount,amount,paidOn,notes.trim());
+    await db.runAsync('INSERT INTO audit_logs(entity,entity_id,action,after_json,created_at) VALUES(?,?,?,?,?)','repayment',result.lastInsertRowId,'create',JSON.stringify({loanId,accountId:resolvedAccount,amount,paidOn,notes:notes.trim()}),new Date().toISOString());
   });
 }
 
@@ -218,10 +221,13 @@ export const deleteAccount = (id: number) => serial(() => deleteAccountInternal(
 
 export const listLoans = () => serial(listLoansInternal);
 export const listRepayments = (id: number) => serial(() => listRepaymentsInternal(id));
-export const createLoan = (input: LoanInput) => serial(() => createLoanInternal(input));
-export const addRepayment = (id: number, accountId: number, amount: number, paidOn: string, notes: string) => serial(() => addRepaymentInternal(id,accountId,amount,paidOn,notes));
+export const createLoan = (input: LoanInput, balanceKind: AccountKind) => serial(() => createLoanInternal(input,balanceKind));
+export const addRepayment = (id: number, amount: number, paidOn: string, notes: string, balanceKind: AccountKind) => serial(() => addRepaymentInternal(id,0,amount,paidOn,notes,balanceKind));
 
 export const updateLoanDetails = (id: number, name: string, phone: string, dueOn: string | null, notes: string) => serial(() => updateLoanDetailsInternal(id,name,phone,dueOn,notes));
 export const deleteLoan = (id: number) => serial(() => deleteLoanInternal(id));
 export const deleteRepayment = (id: number) => serial(() => deleteRepaymentInternal(id));
 export const listAuditLogs = () => serial(listAuditLogsInternal);
+
+/** All backup work must share the ledger queue; never race with a financial write. */
+export const withLedgerDatabase = <T>(operation: (db: SQLite.SQLiteDatabase) => Promise<T>) => serial(async () => operation(await database()));

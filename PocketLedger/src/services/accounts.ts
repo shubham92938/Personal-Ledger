@@ -1,9 +1,4 @@
 export type BalanceAccount = { id: number; kind: 'cash' | 'online'; balance_paise: number };
-/** A category is unambiguous only when it contains exactly one account. */
-export function soleAccountId(accounts: readonly Pick<BalanceAccount, 'id' | 'kind'>[], kind: BalanceAccount['kind']): number | null {
-  const matches = accounts.filter(account => account.kind === kind);
-  return matches.length === 1 ? matches[0].id : null;
-}
 /** Totals use the calculated balances, never manually maintained dashboard values. */
 export function accountTotals(accounts: readonly BalanceAccount[]) {
   let cash = 0, online = 0;
