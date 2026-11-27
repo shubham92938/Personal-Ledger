@@ -1,0 +1,23 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1920
+PlayResY: 1080
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+YCbCr Matrix: TV.709
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Narration,DejaVu Sans,39,&H00F9F8F5,&H0000DFFF,&H00251D19,&H80251D19,0,0,0,0,100,100,.1,0,1,2.4,1.2,2,100,100,65,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.18,0:00:02.55,Narration,,0,0,0,,There is no attendant beside this {\c&H00E9F9&\i1}bronze chest.{\r}
+Dialogue: 0,0:00:02.83,0:00:04.51,Narration,,0,0,0,,No handle to turn, either.
+Dialogue: 0,0:00:04.83,0:00:06.45,Narration,,0,0,0,,But drop a {\c&H00E9F9&\i1}coin{\r} through that slot,
+Dialogue: 0,0:00:06.68,0:00:08.18,Narration,,0,0,0,,and the spout gives you water.
+Dialogue: 0,0:00:08.45,0:00:10.74,Narration,,0,0,0,,A moment later, it {\c&H00E9F9&\i1}shuts itself off.{\r}
+Dialogue: 0,0:00:10.98,0:00:13.39,Narration,,0,0,0,,The design comes from Heron of Alexandria.
+Dialogue: 0,0:00:13.71,0:00:18.78,Narration,,0,0,0,,It's an ancient {\c&H00E9F9&\i1}vending machine,{\r}\Nnot for snacks, but for ritual water.
+Dialogue: 0,0:00:18.99,0:00:22.36,Narration,,0,0,0,,The surprising part isn't that the coin starts the flow.
+Dialogue: 0,0:00:22.58,0:00:25.70,Narration,,0,0,0,,It's that the {\c&H00E9F9&\i1}same coin{\r} tells the machine when to stop.

@@ -1,0 +1,10 @@
+{
+  "linked_lid_samples": 1018,
+  "maximum_beam_lid_gap_world_units": 0.0,
+  "door_hinges_checked": 22,
+  "longform_shots_smoke_tested": 166,
+  "sample_shot": "coin_inside from approximately 41.34 to 49.15s",
+  "original_camera_total_displacement_world_units": 0.2918972373008728,
+  "revised_camera_total_displacement_world_units": 1.9496113061904907,
+  "note": "Geometric checks do not verify motion perception, historical fidelity, spoken timing, or sound; human playback remains required."
+}

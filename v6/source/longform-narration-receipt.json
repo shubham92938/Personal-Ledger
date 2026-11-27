@@ -1,0 +1,107 @@
+{
+  "title": "The Ancient Machines That Moved Themselves",
+  "voice_id": "voice-03",
+  "language": "en",
+  "sample_rate": 48000,
+  "channels": 1,
+  "samples": 54009120,
+  "duration_s": 1125.19,
+  "word_count": 2981,
+  "sample_peak_dbfs": -3.204692288087489,
+  "segment_map": [
+    {
+      "name": "Hook: coin chest",
+      "timeline_start": 0.0,
+      "timeline_end": 25.86,
+      "source": "approved user-selected voice-03, original part 1",
+      "spoken": true
+    },
+    {
+      "name": "Preview: fire, birds, theatre",
+      "timeline_start": 26.08,
+      "timeline_end": 40.93,
+      "source": "long-01 0:15.125s",
+      "spoken": true
+    },
+    {
+      "name": "Coin dispenser mechanism and reset",
+      "timeline_start": 41.33,
+      "timeline_end": 168.05,
+      "source": "approved user-selected voice-03, original parts 2-4",
+      "spoken": true
+    },
+    {
+      "name": "Temple doors, start",
+      "timeline_start": 170.65,
+      "timeline_end": 253.32,
+      "source": "long-01 15.125s:end",
+      "spoken": true
+    },
+    {
+      "name": "Long-form take 02",
+      "timeline_start": 253.66,
+      "timeline_end": 350.19,
+      "source": "long-02, samples 3360:4636800",
+      "spoken": true
+    },
+    {
+      "name": "Long-form take 03",
+      "timeline_start": 352.89,
+      "timeline_end": 448.55,
+      "source": "long-03, samples 3360:4595040",
+      "spoken": true
+    },
+    {
+      "name": "Long-form take 04",
+      "timeline_start": 448.93,
+      "timeline_end": 542.1,
+      "source": "long-04, samples 3840:4476000",
+      "spoken": true
+    },
+    {
+      "name": "Long-form take 05",
+      "timeline_start": 544.1,
+      "timeline_end": 637.88,
+      "source": "long-05, samples 2400:4503840",
+      "spoken": true
+    },
+    {
+      "name": "Long-form take 06",
+      "timeline_start": 640.18,
+      "timeline_end": 733.57,
+      "source": "long-06, samples 3360:4486080",
+      "spoken": true
+    },
+    {
+      "name": "Long-form take 07",
+      "timeline_start": 733.91,
+      "timeline_end": 831.59,
+      "source": "long-07, samples 5280:4693920",
+      "spoken": true
+    },
+    {
+      "name": "Long-form take 08",
+      "timeline_start": 831.94,
+      "timeline_end": 926.5,
+      "source": "long-08, samples 2880:4541760",
+      "spoken": true
+    },
+    {
+      "name": "Long-form take 09",
+      "timeline_start": 926.85,
+      "timeline_end": 1023.26,
+      "source": "long-09, samples 3360:4631040",
+      "spoken": true
+    },
+    {
+      "name": "Long-form take 10",
+      "timeline_start": 1023.61,
+      "timeline_end": 1125.19,
+      "source": "long-10, samples 3840:4879680",
+      "spoken": true
+    }
+  ],
+  "sha256": "e9594037b99b1c1e8051827aeace4e52f785c4120a2f436728423bb50381ad06",
+  "method": "Dry, 48 kHz/16-bit lossless FLAC. Same selected synthetic voice; reassembled by silence edits, no pitch shifting or time stretching. Part 01 split at a verified digital-zero gap; intentional chapter pauses.",
+  "file_size": 51614546
+}

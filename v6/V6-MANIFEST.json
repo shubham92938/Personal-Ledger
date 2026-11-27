@@ -1,0 +1,20 @@
+{
+  "package": "Cinematic 3D Upgrade",
+  "version": "6.0.0",
+  "base": "V3/V4/V5 source retained",
+  "entrypoint": "stage_cine_v6.py",
+  "features": [
+    "Layered water wave and micro-normal shader",
+    "Fresnel response and directional specular glints",
+    "Depth-aware water absorption and caustic detail",
+    "Highlight shoulder and protected midtone contrast",
+    "V5 temporal-stability patches retained",
+    "V6 still renderer and review contact-sheet metrics"
+  ],
+  "validation": {
+    "python_syntax": "passed",
+    "source_patch_chain": "passed",
+    "glsl_compile": "not run; moderngl unavailable in build environment",
+    "visual_render": "not run; requires supported OpenGL 3.3/EGL host"
+  }
+}

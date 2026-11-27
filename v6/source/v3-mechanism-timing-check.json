@@ -1,0 +1,216 @@
+{
+  "checks": {
+    "temple_before_flame": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "temple_water_enters_before_door": [
+      1.0,
+      0.648,
+      0.0
+    ],
+    "temple_door_pulled_after_bucket": [
+      1.0,
+      1.0,
+      0.3256897871409831
+    ],
+    "temple_cooling_before_return": [
+      0.0,
+      1.0,
+      1.0
+    ],
+    "temple_bucket_lighter_before_door_closes": [
+      0.0,
+      0.19495959752009973,
+      1.0
+    ],
+    "temple_closed_after_reset": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "temple_recap_water_before_door": [
+      1.0,
+      0.7407407407407468,
+      0.0
+    ],
+    "temple_recap_door_after_water": [
+      1.0,
+      1.0,
+      0.8819241982507215
+    ],
+    "temple_cut_left": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "temple_cut_right": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "garden_before_old_jump": [
+      0.00040134173525413486,
+      0.00036024330436345105,
+      false,
+      true,
+      0.00036024330436345105
+    ],
+    "garden_after_old_jump": [
+      0.0,
+      0.0,
+      true,
+      false,
+      0.0
+    ],
+    "garden_siphon_full": [
+      1.0,
+      0.0,
+      false,
+      true,
+      0.0
+    ],
+    "garden_explicit_silence": [
+      0.9973713739784397,
+      0.0,
+      false,
+      true,
+      0.002628626021560332
+    ],
+    "garden_cut_to_bucket_left": [
+      0.29490640804005797,
+      0.0,
+      false,
+      true,
+      0.705093591959942
+    ],
+    "garden_cut_to_bucket_right": [
+      0.2910876260377335,
+      0.0,
+      false,
+      true,
+      0.7089123739622665
+    ],
+    "garden_reset_complete": [
+      0.0,
+      0.0,
+      true,
+      false,
+      0.0
+    ],
+    "fountain_before_weakening": [
+      0.9210526315789473,
+      1.0
+    ],
+    "fountain_after_stopping": [
+      1.0,
+      0.0
+    ],
+    "steam_before_ignition": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "steam_before_flow": [
+      1.0,
+      0.0,
+      0.0
+    ],
+    "steam_spin_start": [
+      1.0,
+      1.0,
+      0.0
+    ],
+    "steam_after_acceleration": [
+      1.0,
+      1.0,
+      3.9000000000000004
+    ],
+    "theatre_before_hidden_change": {
+      "sea": false,
+      "intro": false,
+      "cloud": 0.0,
+      "wreck": 0.0
+    },
+    "theatre_after_hidden_change": {
+      "sea": true,
+      "intro": false,
+      "cloud": 0.0,
+      "wreck": 0.0
+    },
+    "theatre_doors_during_change": 0.0,
+    "theatre_before_storm": {
+      "sea": true,
+      "intro": false,
+      "cloud": 0.0,
+      "wreck": 0.0
+    },
+    "theatre_after_storm": {
+      "sea": true,
+      "intro": false,
+      "cloud": 1.0,
+      "wreck": 0.0
+    },
+    "theatre_after_wreck": {
+      "sea": true,
+      "intro": false,
+      "cloud": 1.0,
+      "wreck": 1.0
+    }
+  },
+  "scene_smoke_test_times_s": [
+    175,
+    176.5,
+    180,
+    193.45,
+    205,
+    220,
+    230,
+    260,
+    267,
+    274,
+    279,
+    286,
+    290,
+    295.6,
+    301.99,
+    302.01,
+    352.6,
+    380,
+    396.9,
+    397.1,
+    399.96,
+    400,
+    410,
+    430,
+    440,
+    477,
+    518,
+    555,
+    570,
+    590,
+    592,
+    593.1,
+    604,
+    624,
+    627.5,
+    631.5,
+    634,
+    640,
+    668,
+    700,
+    779.8,
+    875,
+    954,
+    1052,
+    1083,
+    1110,
+    1124
+  ],
+  "caveats": [
+    "The explanatory temple cut at 193.4 resets to replay the hidden mechanism.",
+    "Garden timing and its mixed sound still require listening review.",
+    "Numerical states and still frames do not establish perception, pronunciation, captions or historical accuracy."
+  ]
+}

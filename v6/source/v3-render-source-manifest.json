@@ -1,0 +1,35 @@
+{
+  "fingerprint": "e3e3e3d651de6a933f4d81724bcb75c095a36c2ae7db54aad909fca98f75fcb6",
+  "files": {
+    "render_v3.py": "9a6099fa7fb166afeb8700f2bce9f469a56600a5d64b8473f4659945056ce900",
+    "v3_manifest.py": "4653b9b235ef5ad74c969fb655c789227cb40064346d54a306e54dff9774b1f4",
+    "build_film_v3.py": "4b89f1a002129325ef931dd7b985c104b34d461743798a8a9369ac05506508d5",
+    "film_sequences_v3.py": "312ca1648e148f5627ef286dbe1b9cf7e2a863bc76b40f947f49c9bdeac88bf6",
+    "film_rigs_v3.py": "1f6f9b1047c1f5f09d9e18b80f89f1cf7f5bac79fda84a124dc2689a2d494359",
+    "stage_cine_v3.py": "aac90c8220bad178e717f50da0028932fc5572bd821c3f849983b7be6de2f62c",
+    "build_film.py": "cd8dbc87d0619b057a091f58efdc021d68803e4af51d40b24964cbfbb06988c6",
+    "film_models.py": "3b07bd582d5948f6f00a582e639d8cfec09509bafed217fe5c41d48a522d978e",
+    "build_opening.py": "93ce89c70cde93e87cb49f7d05a16f606af039ce42939bc072057e65bfb44df6",
+    "build_montage.py": "48240c900f83a8fe556a6edf14ec8c88c6325b6e1507a55fd921873b4297fa14",
+    "build_lab.py": "901fd76f14f800b3f2b40e6fe883b8201aa47d6f9d650cda5b1b41672192416c",
+    "engine/geo.py": "0b3aaaabfe7e9b9d47b778b1b208824f20a581d6da479ffb7900cd42d550a609",
+    "engine/forge.py": "5a32c6ff038a68f79761e85d61e0fc960d312343d6b1bc4a856c3b31919d02cb",
+    "engine/stage_fast.py": "1654f1048887e244688abff9fa38337a4c023d120151a44cfd97dd1e517313bc",
+    "engine/stage_cine.py": "11dd5f19108d2066758d2bcd6f07dc43569b3f159ab91e2c12670b3d2ffe89c4",
+    "source/limestone-material.png": "01b4bce507046815072398f52b66bb98354a045a32cf847f478480b5758d8e27",
+    "source/opening-captions.ass": "516c5e146b27c3db813699bea888f9628d03acd83553a1a3fd50e51dc7f6c86f",
+    "source/longform-alignment.json": "0d378ee8c8f719772cebb0ac7ea696526a56211b551328043c867846c533aa00"
+  },
+  "legacy_segments_without_fingerprint": [
+    "00-opening-motion-test",
+    "01-opening-motion-test",
+    "02-opening-revision",
+    "03-montage-revision",
+    "coin-00",
+    "coin-01"
+  ],
+  "segments_planned": 77,
+  "frames_planned": 27005,
+  "soundtrack_sha256": "762004ff5991060f6b6f435e792ba9b6c6dccdb467634881ab2a18bfa8e5a481",
+  "status": "Checkpointed native 24-fps review render; playback QA is still outstanding."
+}

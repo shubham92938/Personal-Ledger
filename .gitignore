@@ -1,2 +1,12 @@
 # Generated source archive
 PocketLedger-source.zip
+
+# V6 stress test artifacts
+google_drive/
+stress/out/
+v6/.cache/
+v6/deliverables/
+v6/work/
+v6/review/
+__pycache__/
+*.pyc
