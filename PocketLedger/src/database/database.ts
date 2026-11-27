@@ -225,3 +225,6 @@ export const updateLoanDetails = (id: number, name: string, phone: string, dueOn
 export const deleteLoan = (id: number) => serial(() => deleteLoanInternal(id));
 export const deleteRepayment = (id: number) => serial(() => deleteRepaymentInternal(id));
 export const listAuditLogs = () => serial(listAuditLogsInternal);
+
+/** All backup work must share the ledger queue; never race with a financial write. */
+export const withLedgerDatabase = <T>(operation: (db: SQLite.SQLiteDatabase) => Promise<T>) => serial(async () => operation(await database()));

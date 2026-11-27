@@ -23,7 +23,15 @@
     "plugins": [
       "expo-router",
       "expo-sqlite",
-      "expo-status-bar"
+      "expo-status-bar",
+      "expo-sharing",
+      "expo-secure-store",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow PocketLedger to authenticate you before showing your ledger."
+        }
+      ]
     ],
     "scheme": "pocketledger"
   }
