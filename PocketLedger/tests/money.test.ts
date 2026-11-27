@@ -11,3 +11,9 @@ test('income, expense and transfers produce correct balances and preserve total'
   assert.equal(balanceFor(500000,entries,1),550000); assert.equal(balanceFor(0,entries,2),100000);
   assert.equal(balanceFor(500000,entries,1)+balanceFor(0,entries,2),650000);
 });
+
+test('optional interest rate accepts blank as zero and rejects invalid or excessive rates',async()=>{
+ const {parseInterestBps}=await import('../src/services/money.ts');
+ assert.equal(parseInterestBps(''),0);assert.equal(parseInterestBps('  '),0);assert.equal(parseInterestBps('2.5'),250);assert.equal(parseInterestBps('100'),10000);
+ assert.equal(parseInterestBps('100.01'),null);assert.equal(parseInterestBps('-1'),null);assert.equal(parseInterestBps('1.234'),null);
+});

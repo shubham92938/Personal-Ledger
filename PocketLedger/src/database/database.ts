@@ -1,5 +1,5 @@
 import * as SQLite from 'expo-sqlite';
-import { Account, AccountKind, LedgerTransaction, TransactionInput, Loan, LoanInput, Repayment } from '../types';
+import { Account, AccountKind, LedgerTransaction, TransactionInput, Loan, LoanInput, Repayment, LoanActivity } from '../types';
 import { calculateLoan, dateDay, localToday } from '../services/interest';
 import { assertEditableTransaction } from '../services/accounts';
 
@@ -64,6 +64,15 @@ async function saveAccountInternal(name: string, kind: AccountKind, opening: num
 async function listTransactionsInternal(): Promise<LedgerTransaction[]> {
   const db = await database();
   return db.getAllAsync<LedgerTransaction>(`SELECT t.*, a.name account_name, a.kind account_kind, d.name destination_name, d.kind destination_kind FROM transactions t JOIN accounts a ON a.id=t.account_id LEFT JOIN accounts d ON d.id=t.destination_id WHERE t.deleted_at IS NULL ORDER BY t.occurred_at DESC, t.id DESC`);
+}
+/** Project existing loan and repayment records into history without creating duplicate balance entries. */
+async function listLoanActivityInternal(): Promise<LoanActivity[]> {
+  const db=await database();
+  return db.getAllAsync<LoanActivity>(`SELECT 'loan' AS event_type,l.id AS id,l.id AS loan_id,l.direction,p.name AS person_name,l.principal_paise AS amount_paise,l.started_on AS occurred_at,a.kind AS account_kind,l.notes AS notes
+    FROM loans l JOIN people p ON p.id=l.person_id JOIN accounts a ON a.id=l.account_id WHERE l.deleted_at IS NULL
+    UNION ALL
+    SELECT 'repayment' AS event_type,r.id AS id,l.id AS loan_id,l.direction,p.name AS person_name,r.amount_paise AS amount_paise,r.paid_on AS occurred_at,a.kind AS account_kind,r.notes AS notes
+    FROM repayments r JOIN loans l ON l.id=r.loan_id JOIN people p ON p.id=l.person_id JOIN accounts a ON a.id=r.account_id WHERE r.deleted_at IS NULL AND l.deleted_at IS NULL`);
 }
 /** Keep legacy account rows intact, but choose a backing row automatically per balance type. */
 async function resolveBalanceAccount(db: SQLite.SQLiteDatabase, kind?: AccountKind, preferredId = 0): Promise<number> {
@@ -214,6 +223,8 @@ function serial<T>(operation: () => Promise<T>): Promise<T> {
 }
 export const listAccounts = () => serial(listAccountsInternal);
 export const listTransactions = () => serial(listTransactionsInternal);
+/** Read both parts together on the ledger queue to avoid interleaving financial writes. */
+export const listHistory = () => serial(async () => ({transactions:await listTransactionsInternal(),loanActivity:await listLoanActivityInternal()}));
 export const saveAccount = (name: string, kind: AccountKind, opening: number, id?: number) => serial(() => saveAccountInternal(name,kind,opening,id));
 export const saveTransaction = (input: TransactionInput, id?: number, accountKind?: AccountKind) => serial(() => saveTransactionInternal(input,id,accountKind));
 export const deleteTransaction = (id: number) => serial(() => deleteTransactionInternal(id));

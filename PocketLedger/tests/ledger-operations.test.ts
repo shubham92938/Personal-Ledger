@@ -83,3 +83,30 @@ test('language translations use English fallback for unknown text',()=>{
  assert.equal(translate('en','Cash'),'Cash');
  assert.equal(translate('hi','A customer name'),'A customer name');
 });
+
+test('both loan directions, interest, repayments and history share one consistent balance',async()=>{
+ const {ledger,sql}=makeLedger();
+ try {
+  await ledger.database();
+  sql.exec("INSERT INTO accounts(name,kind,opening_paise) VALUES('Cash','cash',1000000),('Bank','online',0)");
+  const today=interest.localToday();const local=new Date();local.setDate(local.getDate()-30);
+  const start=`${local.getFullYear()}-${String(local.getMonth()+1).padStart(2,'0')}-${String(local.getDate()).padStart(2,'0')}`;
+  const base={phone:'',principal_paise:100000,account_id:0,rate_bps:200,rate_period:'monthly',started_on:start,due_on:null,notes:''};
+  const lent=await ledger.createLoan({...base,person_name:'Lent Person',direction:'lent'},'cash');
+  const borrowed=await ledger.createLoan({...base,person_name:'Borrowed Person',direction:'borrowed'},'cash');
+  assert.equal((await ledger.listAccounts())[0].balance_paise,1000000);
+  const loans=await ledger.listLoans();assert.equal(loans.find((l:any)=>l.id===lent).direction,'lent');assert.equal(loans.find((l:any)=>l.id===borrowed).direction,'borrowed');
+  for(const loan of loans)assert.equal(interest.calculateLoan(loan,[],today).outstanding,102000);
+  await ledger.addRepayment(lent,3000,today,'received','online');
+  await ledger.addRepayment(borrowed,3000,today,'paid','cash');
+  assert.deepEqual((await ledger.listAccounts()).map((a:any)=>a.balance_paise),[997000,3000]);
+  for(const loan of loans){const payments=await ledger.listRepayments(loan.id);const result=interest.calculateLoan(loan,payments,today);assert.equal(result.accruedInterest,2000);assert.equal(result.interestRemaining,0);assert.equal(result.principalRemaining,99000);}
+  let history=await ledger.listHistory();assert.equal(history.transactions.length,0);assert.equal(history.loanActivity.length,4);
+  assert.deepEqual(history.loanActivity.map((e:any)=>[e.event_type,e.direction,e.account_kind]).sort(),[['loan','borrowed','cash'],['loan','lent','cash'],['repayment','borrowed','cash'],['repayment','lent','online']].sort());
+  const repayment=history.loanActivity.find((e:any)=>e.event_type==='repayment'&&e.loan_id===lent);
+  await ledger.deleteRepayment(repayment.id);history=await ledger.listHistory();assert.equal(history.loanActivity.length,3);assert.equal((await ledger.listAccounts())[1].balance_paise,0);
+  await ledger.deleteLoan(borrowed);history=await ledger.listHistory();assert.equal(history.loanActivity.length,1);assert.equal(history.loanActivity[0].loan_id,lent);
+  assert.equal((await ledger.listAccounts())[0].balance_paise,900000);
+  assert.equal(sql.prepare('SELECT COUNT(*) AS n FROM transactions').get()?.n,0);
+ } finally {sql.close();}
+});
