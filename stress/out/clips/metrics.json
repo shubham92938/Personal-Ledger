@@ -1,0 +1,217 @@
+{
+  "plan": {
+    "width": 960,
+    "fps": 12,
+    "windows": 7,
+    "static_clips": [
+      "s3-gears-macro",
+      "s5-water-macro"
+    ],
+    "budget_seconds": 7200.0,
+    "projected_clip_seconds": 71.0
+  },
+  "clips": [
+    {
+      "clip": "stress/out/clips/v6-moving-s1-establishing.mp4",
+      "window": [
+        6.8,
+        10.7
+      ],
+      "fps": 12,
+      "width": 960,
+      "height": 540,
+      "frames": 47,
+      "frozen_camera": false,
+      "wall_seconds": 7.9,
+      "mean_luma": 0.5647,
+      "max_highlight_clip": 0.0,
+      "max_shadow_clip": 0.0,
+      "mean_edge_energy": 0.03028,
+      "temporal_mae_mean": 6.4399,
+      "temporal_mae_max": 10.0207,
+      "sample_frames": [
+        "stress/out/clips/frame-s1-establishing-moving-023.jpg"
+      ]
+    },
+    {
+      "clip": "stress/out/clips/v6-moving-s2-dolly-machine.mp4",
+      "window": [
+        41.4,
+        47.4
+      ],
+      "fps": 12,
+      "width": 960,
+      "height": 540,
+      "frames": 72,
+      "frozen_camera": false,
+      "wall_seconds": 9.4,
+      "mean_luma": 0.5202,
+      "max_highlight_clip": 0.0,
+      "max_shadow_clip": 0.0,
+      "mean_edge_energy": 0.03619,
+      "temporal_mae_mean": 5.5474,
+      "temporal_mae_max": 10.533,
+      "sample_frames": [
+        "stress/out/clips/frame-s2-dolly-machine-moving-036.jpg"
+      ]
+    },
+    {
+      "clip": "stress/out/clips/v6-moving-s3-gears-macro.mp4",
+      "window": [
+        1012.0,
+        1018.0
+      ],
+      "fps": 12,
+      "width": 960,
+      "height": 540,
+      "frames": 72,
+      "frozen_camera": false,
+      "wall_seconds": 7.9,
+      "mean_luma": 0.5685,
+      "max_highlight_clip": 0.0,
+      "max_shadow_clip": 0.0,
+      "mean_edge_energy": 0.03266,
+      "temporal_mae_mean": 3.7794,
+      "temporal_mae_max": 6.6215,
+      "sample_frames": [
+        "stress/out/clips/frame-s3-gears-macro-moving-036.jpg"
+      ]
+    },
+    {
+      "clip": "stress/out/clips/v6-static-s3-gears-macro.mp4",
+      "window": [
+        1012.0,
+        1018.0
+      ],
+      "fps": 12,
+      "width": 960,
+      "height": 540,
+      "frames": 72,
+      "frozen_camera": true,
+      "wall_seconds": 8.2,
+      "mean_luma": 0.5608,
+      "max_highlight_clip": 0.0,
+      "max_shadow_clip": 0.0,
+      "mean_edge_energy": 0.03271,
+      "temporal_mae_mean": 1.2397,
+      "temporal_mae_max": 1.2929,
+      "sample_frames": [
+        "stress/out/clips/frame-s3-gears-macro-static-000.jpg",
+        "stress/out/clips/frame-s3-gears-macro-static-036.jpg",
+        "stress/out/clips/frame-s3-gears-macro-static-071.jpg"
+      ]
+    },
+    {
+      "clip": "stress/out/clips/v6-moving-s4-wheel-track.mp4",
+      "window": [
+        640.0,
+        646.0
+      ],
+      "fps": 12,
+      "width": 960,
+      "height": 540,
+      "frames": 72,
+      "frozen_camera": false,
+      "wall_seconds": 7.6,
+      "mean_luma": 0.4536,
+      "max_highlight_clip": 0.0,
+      "max_shadow_clip": 0.0,
+      "mean_edge_energy": 0.03319,
+      "temporal_mae_mean": 6.8345,
+      "temporal_mae_max": 14.5479,
+      "sample_frames": [
+        "stress/out/clips/frame-s4-wheel-track-moving-036.jpg"
+      ]
+    },
+    {
+      "clip": "stress/out/clips/v6-moving-s5-water-macro.mp4",
+      "window": [
+        84.0,
+        88.0
+      ],
+      "fps": 12,
+      "width": 960,
+      "height": 540,
+      "frames": 48,
+      "frozen_camera": false,
+      "wall_seconds": 7.5,
+      "mean_luma": 0.5841,
+      "max_highlight_clip": 0.0,
+      "max_shadow_clip": 0.0,
+      "mean_edge_energy": 0.03107,
+      "temporal_mae_mean": 4.7498,
+      "temporal_mae_max": 10.0675,
+      "sample_frames": [
+        "stress/out/clips/frame-s5-water-macro-moving-024.jpg"
+      ]
+    },
+    {
+      "clip": "stress/out/clips/v6-static-s5-water-macro.mp4",
+      "window": [
+        84.0,
+        88.0
+      ],
+      "fps": 12,
+      "width": 960,
+      "height": 540,
+      "frames": 48,
+      "frozen_camera": true,
+      "wall_seconds": 7.1,
+      "mean_luma": 0.5711,
+      "max_highlight_clip": 0.0,
+      "max_shadow_clip": 0.0,
+      "mean_edge_energy": 0.03144,
+      "temporal_mae_mean": 0.1277,
+      "temporal_mae_max": 0.1543,
+      "sample_frames": [
+        "stress/out/clips/frame-s5-water-macro-static-000.jpg",
+        "stress/out/clips/frame-s5-water-macro-static-024.jpg",
+        "stress/out/clips/frame-s5-water-macro-static-047.jpg"
+      ]
+    },
+    {
+      "clip": "stress/out/clips/v6-moving-s6-orbit.mp4",
+      "window": [
+        181.0,
+        187.0
+      ],
+      "fps": 12,
+      "width": 960,
+      "height": 540,
+      "frames": 72,
+      "frozen_camera": false,
+      "wall_seconds": 8.5,
+      "mean_luma": 0.6365,
+      "max_highlight_clip": 0.0,
+      "max_shadow_clip": 0.0,
+      "mean_edge_energy": 0.03761,
+      "temporal_mae_mean": 4.8915,
+      "temporal_mae_max": 8.7457,
+      "sample_frames": [
+        "stress/out/clips/frame-s6-orbit-moving-036.jpg"
+      ]
+    },
+    {
+      "clip": "stress/out/clips/v6-moving-s7-pullback-wide.mp4",
+      "window": [
+        704.0,
+        710.0
+      ],
+      "fps": 12,
+      "width": 960,
+      "height": 540,
+      "frames": 72,
+      "frozen_camera": false,
+      "wall_seconds": 7.3,
+      "mean_luma": 0.5779,
+      "max_highlight_clip": 0.0,
+      "max_shadow_clip": 0.0,
+      "mean_edge_energy": 0.03687,
+      "temporal_mae_mean": 5.888,
+      "temporal_mae_max": 12.0645,
+      "sample_frames": [
+        "stress/out/clips/frame-s7-pullback-wide-moving-036.jpg"
+      ]
+    }
+  ]
+}
