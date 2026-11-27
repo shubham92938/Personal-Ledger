@@ -36,12 +36,12 @@ V6 = HERE.parent / "v6"
 sys.path[:0] = [str(V6), str(V6 / "engine")]
 
 WINDOWS = [
-    ("s1-establishing", 10.0, 16.0),
+    ("s1-establishing", 6.8, 10.7),
     ("s2-dolly-machine", 41.3, 47.3),
     ("s3-gears-macro", 1012.0, 1018.0),
     ("s4-wheel-track", 640.0, 646.0),
     ("s5-water-macro", 84.0, 88.0),
-    ("s6-orbit", 181.0, 189.0),
+    ("s6-orbit", 181.0, 187.0),
     ("s7-pullback-wide", 704.0, 710.0),
 ]
 STATIC = {"s3-gears-macro", "s5-water-macro"}

@@ -10,8 +10,10 @@ on:
   push:
     paths:
       - '.github/workflows/v6-stress.yml'
-      - 'stress/**'
-      - 'v6/**'
+      - 'stress/mode.txt'
+
+permissions:
+  contents: write
 
 jobs:
   stress:
@@ -20,10 +22,20 @@ jobs:
     env:
       LIBGL_ALWAYS_SOFTWARE: '1'
       GALLIUM_DRIVER: llvmpipe
+      EGL_PLATFORM: surfaceless
       LP_NUM_THREADS: '4'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Resolve mode
+        run: |
+          M="${{ inputs.mode }}"
+          if [ -z "$M" ]; then M=$(cat stress/mode.txt 2>/dev/null || echo probe); fi
+          echo "MODE=$M" >> "$GITHUB_ENV"
+          echo "MODE=$M"
 
       - name: Python
         uses: actions/setup-python@v5
@@ -48,7 +60,7 @@ jobs:
         run: python stress/probe.py
 
       - name: Stills — V3/V4/V5/V6 at identical times (V6-README A/B)
-        if: ${{ github.event_name == 'push' || inputs.mode == 'full' || inputs.mode == 'stills' }}
+        if: ${{ env.MODE == 'full' || env.MODE == 'stills' }}
         run: |
           for v in v3 v4 v5; do
             python v6/render_v5_stills.py --stage $v --times 5,20,45,180,380,630,900,1080 \
@@ -58,26 +70,91 @@ jobs:
             --width 1280 --outdir stress/out/stills/v6
 
       - name: Establishing stills (high resolution)
-        if: ${{ github.event_name == 'push' || inputs.mode == 'full' || inputs.mode == 'stills' }}
+        if: ${{ env.MODE == 'full' || env.MODE == 'stills' }}
         run: |
           python v6/render_v6_stills.py --times 20 --width 2560 --outdir stress/out/establishing
           python v6/render_v6_stills.py --times 5,45 --width 1920 --outdir stress/out/establishing-alt
 
       - name: Material close-up stills
-        if: ${{ github.event_name == 'push' || inputs.mode == 'full' || inputs.mode == 'stills' }}
+        if: ${{ env.MODE == 'full' || env.MODE == 'stills' }}
         run: |
           python v6/render_v6_stills.py --times 49.2,84,211.2,380,646,954 \
             --width 1920 --outdir stress/out/closeups
 
       - name: Review tooling (V6 contact sheet + exposure metrics)
-        if: ${{ github.event_name == 'push' || inputs.mode == 'full' || inputs.mode == 'stills' }}
+        if: ${{ env.MODE == 'full' || env.MODE == 'stills' }}
         run: python v6/review_v6.py stress/out/stills/v6/*.png --out stress/out/review
 
       - name: Moving-camera clips with inline temporal metrics
-        if: ${{ github.event_name == 'push' || inputs.mode == 'full' || inputs.mode == 'clips' }}
+        if: ${{ env.MODE == 'full' || env.MODE == 'clips' }}
         run: python stress/render_clips.py --outdir stress/out/clips --width 960 --fps 12 --budget 7200
 
-      - name: Upload artifacts
+      - name: Prepare slim output payload
+        if: ${{ success() && env.MODE != 'probe' }}
+        run: |
+          python - <<'EOF'
+          from pathlib import Path
+          from PIL import Image
+          import json, shutil
+          out = Path("stress/out")
+          # Slim the A/B still sets: JPEG for review, PNG only for hero stills.
+          for ver in ("v3", "v4", "v5", "v6"):
+              d = out / "stills" / ver
+              if d.exists():
+                  for p in list(d.glob("*.png")):
+                      im = Image.open(p).convert("RGB")
+                      im.save(p.with_suffix(".jpg"), quality=92)
+                      p.unlink()
+          alt = out / "establishing-alt"
+          if alt.exists():
+              for p in list(alt.glob("*.png")):
+                  im = Image.open(p).convert("RGB")
+                  im.save(p.with_suffix(".jpg"), quality=92)
+                  p.unlink()
+          cop = out / "closeups"
+          if cop.exists():
+              for p in list(cop.glob("*.png")):
+                  im = Image.open(p).convert("RGB")
+                  im.save(p.with_suffix(".jpg"), quality=95)
+                  p.unlink()
+          # Drop per-frame metric rows (bulky); keep summaries + sample frames.
+          m = out / "clips" / "metrics.json"
+          if m.exists():
+              data = json.loads(m.read_text())
+              for c in data.get("clips", []):
+                  c.pop("rows", None)
+              m.write_text(json.dumps(data, indent=2))
+          print("payload slimmed")
+          EOF
+          du -sh stress/out || true
+
+      - name: Commit outputs to the working branch
+        if: ${{ success() && env.MODE != 'probe' }}
+        run: |
+          git config user.name "v6-stress-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -f stress/out
+          git commit -q -m "V6 stress test outputs (mode=${MODE})" || echo "nothing to commit"
+          for i in 1 2 3; do
+            git pull --rebase -q origin "${GITHUB_REF#refs/heads/}" && git push -q origin "HEAD:${GITHUB_REF#refs/heads/}" && break
+            echo "push retry $i"; sleep 5
+          done
+
+      - name: Commit failure diagnostics
+        if: ${{ failure() }}
+        run: |
+          git config user.name "v6-stress-bot"
+          git config user.email "actions@users.noreply.github.com"
+          mkdir -p stress/out
+          git add -f stress/out 2>/dev/null || true
+          git commit -q -m "V6 stress test diagnostics (failure)" || echo "nothing to commit"
+          for i in 1 2 3; do
+            git pull --rebase -q origin "${GITHUB_REF#refs/heads/}" && git push -q origin "HEAD:${GITHUB_REF#refs/heads/}" && break
+            echo "push retry $i"; sleep 5
+          done
+
+      - name: Upload artifacts (best effort)
+        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: v6-stress-test
